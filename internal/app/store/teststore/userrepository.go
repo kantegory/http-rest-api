@@ -1,8 +1,8 @@
 package teststore
 
 import (
+	"github.com/kantegory/http-rest-api/internal/app/store"
 	"github.com/kantegory/http-rest-api/internal/app/model"
-	"errors"
 )
 
 // UserRepository ...
@@ -32,7 +32,7 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 	u, ok := r.users[email]
 
 	if !ok {
-		return nil, errors.New("not found")
+		return nil, store.ErrRecordNotFound
 	}
 
 	return u, nil

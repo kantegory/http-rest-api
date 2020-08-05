@@ -2,6 +2,7 @@ package sqlstore_test
 
 import (
 	"testing"
+	"github.com/kantegory/http-rest-api/internal/app/store"
 	"github.com/kantegory/http-rest-api/internal/app/store/sqlstore"
 	"github.com/kantegory/http-rest-api/internal/app/model"
 	"github.com/stretchr/testify/assert"
@@ -32,7 +33,7 @@ func TestUserRepositury_FindByEmail(t *testing.T) {
 	email := "user@example.org"
 
 	_, err := s.User().FindByEmail(email)
-	assert.Error(t, err)
+	assert.EqualError(t, err, store.ErrRecordNotFound.Error())
 
 	u := model.TestUser(t)
 	u.Email = email
