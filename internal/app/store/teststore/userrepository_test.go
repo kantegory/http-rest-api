@@ -1,8 +1,8 @@
-package sqlstore_test
+package teststore_test
 
 import (
 	"testing"
-	"github.com/kantegory/http-rest-api/internal/app/store/sqlstore"
+	"github.com/kantegory/http-rest-api/internal/app/store/teststore"
 	"github.com/kantegory/http-rest-api/internal/app/model"
 	"github.com/stretchr/testify/assert"
 )
@@ -10,11 +10,7 @@ import (
 
 // TestUserRepositury_Create ...
 func TestUserRepositury_Create(t *testing.T) {
-	db, teardown := sqlstore.TestDB(t, databaseURL)
-
-	defer teardown("users")
-
-	s := sqlstore.New(db)
+	s := teststore.New()
 	u := model.TestUser(t)
 	err := s.User().Create(u)
 
@@ -24,11 +20,7 @@ func TestUserRepositury_Create(t *testing.T) {
 
 // TestUserRepositury_FindByEmail ...
 func TestUserRepositury_FindByEmail(t *testing.T) {
-	db, teardown := sqlstore.TestDB(t, databaseURL)
-
-	defer teardown("users")
-
-	s := sqlstore.New(db)
+	s := teststore.New()
 	email := "user@example.org"
 
 	_, err := s.User().FindByEmail(email)
