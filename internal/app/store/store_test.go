@@ -14,7 +14,7 @@ func TestMain(m *testing.M) {
 	databaseURL = os.Getenv("DATABASE_URL")
 
 	if databaseURL == "" {
-		databaseURL = "host=localhost dbname=restapi_test sslmode=disable user=YOURUSER password=YOURPASSWORD"
+		databaseURL = "host=localhost dbname=restapi_test sslmode=disable"
 	}
 
 	os.Exit(m.Run())
