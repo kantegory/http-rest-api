@@ -1,10 +1,10 @@
-package store
+package sqlstore
 
 import "github.com/kantegory/http-rest-api/internal/app/model"
 
 // UserRepository ...
 type UserRepository struct {
-	store *Store
+	sqlstore *Store
 }
 
 // Create ...
@@ -17,7 +17,7 @@ func (r *UserRepository) Create(u *model.User) (*model.User, error) {
 		return nil, err
 	}
 
-	if err := r.store.db.QueryRow(
+	if err := r.sqlstore.db.QueryRow(
 		"INSERT INTO users (email, encrypted_password) VALUES ($1, $2) RETURNING id",
 		u.Email,
 		u.EncryptedPassword,
@@ -32,7 +32,7 @@ func (r *UserRepository) Create(u *model.User) (*model.User, error) {
 func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 	u := &model.User{}
 
-	if err := r.store.db.QueryRow(
+	if err := r.sqlstore.db.QueryRow(
 		"SELECT * FROM users WHERE email = $1",
 		email,
 	).Scan(

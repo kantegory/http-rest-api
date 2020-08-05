@@ -1,4 +1,4 @@
-package store
+package sqlstore
 
 import (
 	"database/sql"
@@ -25,7 +25,7 @@ func (s *Store) User() *UserRepository {
 	}
 
 	s.userRepository = &UserRepository{
-		store: s,
+		sqlstore: s,
 	}
 
 	return s.userRepository
