@@ -1,83 +1,37 @@
 package apiserver
 
 import (
-	"github.com/sirupsen/logrus"
-	"github.com/gorilla/mux"
-    "github.com/kantegory/http-rest-api/internal/app/store/sqlstore"
 	"net/http"
-	"io"
+	"database/sql"
+	"github.com/kantegory/http-rest-api/internal/app/store/sqlstore"
 )
 
-// APIServer ...
-type APIServer struct {
-	config *Config
-	logger *logrus.Logger
-	router *mux.Router
-	sqlstore *sqlstore.Store
-}
-
-// New ...
-func New(config *Config) *APIServer {
-	return &APIServer{
-		config: config,
-		logger: logrus.New(),
-		router: mux.NewRouter(),
-	}
-}
-
-// Start ...
-func (s *APIServer) Start() error {
-	if err := s.configureLogger(); err != nil {
-		return err
-	}
-
-	s.configureRouter()
-
-	if err := s.configureStore(); err != nil {
-		return err
-	}
-
-	s.configureStore()
-
-	s.logger.Info("Starting API server")
-
-	return http.ListenAndServe(s.config.BindAddr, s.router)
-}
-
-// configureLogger ...
-func (s *APIServer) configureLogger() error {
-	level, err := logrus.ParseLevel(s.config.LogLevel)
+// Start() ...
+func Start(config *Config) error {
+	db, err := newDB(config.DatabaseURL)
 
 	if err != nil {
 		return err
 	}
 
-	s.logger.SetLevel(level)
+	defer db.Close()
+	store := sqlstore.New(db)
+	srv := newServer(store)
 
-	return nil
+	return http.ListenAndServe(config.BindAddr, srv)
 }
 
-// configureRouter ...
-func (s *APIServer) configureRouter() {
-	s.router.HandleFunc("/hello", s.handleHello())
-}
+// newDB() ...
+func newDB(databaseURL string) (*sql.DB, error) {
+	db, err := sql.Open("postgres", databaseURL)
 
-// configureStore ...
-func (s *APIServer) configureStore() error {
-	st := sqlstore.New(s.config.Store)
-
-	if err := st.Open(); err != nil {
-		return err
+	if err != nil {
+		return nil, err
 	}
 
-	s.sqlstore = st
-
-	return nil
-}
-
-// handleHello ...
-func (s *APIServer) handleHello() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, "Hello")
+	if err := db.Ping(); err != nil {
+		return nil, err
 	}
+
+	return db, nil
 }
